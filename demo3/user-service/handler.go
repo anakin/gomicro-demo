@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	pb "github.com/anakin/gomicro/user-service/proto/user"
+	"log"
+
+	pb "github.com/anakin/gomicro-demo/demo3/user-service/proto/user"
 	"github.com/micro/go-micro/metadata"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type service struct {
