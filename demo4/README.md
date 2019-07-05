@@ -3,7 +3,9 @@
 1. consul地址 127.0.0.1：8500
 2. mysql地址 127.0.0.1：3306
 3. consul k/v 设置：
+
   key:/micro/config/database
+  
   value:
   ```
 {
