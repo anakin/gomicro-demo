@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/anakin/gomicro-demo/demo4/user-service/proto/user"
+	pb "demo4/user-service/proto/user"
 )
 
 type service struct {

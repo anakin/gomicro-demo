@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/anakin/gomicro-demo/demo4/api/handler"
+	"demo4/api/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/micro/go-micro/web"

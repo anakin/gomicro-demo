@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	pb "github.com/anakin/gomicro-demo/demo3/user-service/proto/user"
+	pb "demo3/user-service/proto/user"
 	"github.com/micro/go-micro/metadata"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"

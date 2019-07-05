@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/anakin/gomicro-demo/demo4/user-service/dbops"
-	pb "github.com/anakin/gomicro-demo/demo4/user-service/proto/user"
+	"demo4/user-service/dbops"
+	pb "demo4/user-service/proto/user"
 )
 
 type Repository interface {

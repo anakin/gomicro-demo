@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/anakin/gomicro-demo/demo4/user-service/config"
+	"demo4/user-service/config"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )

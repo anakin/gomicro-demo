@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/anakin/gomicro-demo/demo4/user-service/dbops"
-	pb "github.com/anakin/gomicro-demo/demo4/user-service/proto/user"
+	"demo4/user-service/dbops"
+	pb "demo4/user-service/proto/user"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"

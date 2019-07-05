@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "github.com/anakin/gomicro-demo/demo3/user-service/proto/user"
+	pb "demo3/user-service/proto/user"
 	"github.com/dgrijalva/jwt-go"
 )
 

@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	usersrv "github.com/anakin/gomicro-demo/demo4/user-service/proto/user"
+	usersrv "demo4/user-service/proto/user"
 	"github.com/gin-gonic/gin"
 	"github.com/go-log/log"
 	"github.com/micro/go-micro/client"

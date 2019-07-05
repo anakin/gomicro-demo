@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/anakin/gomicro-demo/demo2/proto/user"
+	pb "demo2/proto/user"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"
 )

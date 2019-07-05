@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/anakin/gomicro-demo/demo3/user-service/proto/user"
+	pb "demo3/user-service/proto/user"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"
 )

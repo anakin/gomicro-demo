@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/anakin/gomicro-demo/demo3/middleware"
-	pb "github.com/anakin/gomicro-demo/demo3/user-service/proto/user"
+	"demo3/middleware"
+	pb "demo3/user-service/proto/user"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
