@@ -1,0 +1,18 @@
+syntax="proto3";
+package diner;
+service DinerService{
+    rpc GetByUserId(Request) returns (Response){}
+}
+
+message Request{
+int32 id=1;
+}
+
+message Response{
+Diner diner=1;
+}
+message Diner{
+string id=1;
+string desc=2;
+}
+

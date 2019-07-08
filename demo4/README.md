@@ -1,7 +1,13 @@
 ## demo4
 ### 读取consul配置，api代理等
-1. consul地址 127.0.0.1：8500
-2. mysql地址 127.0.0.1：3306
+1. 环境配置：
+	consul地址 127.0.0.1：8500(服务发现，配置管理)
+
+ 	mysql地址 127.0.0.1：3306a(数据库)
+
+	nats地址：127.0.0.1：4222(broker)
+2. user服务发布消息，其他服务订阅
+
 3. consul k/v 设置：
 
   key:/micro/config/database
