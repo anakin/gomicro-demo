@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"demo4/user-service/dbops"
+	"github.com/micro/go-micro/broker/nats"
 	pb "demo4/user-service/proto/user"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
@@ -14,9 +15,11 @@ func main() {
 	var consulAddr string
 	reg := consul.NewRegistry()
 
+	broker:=nats.NewBroker()
 	repo := &UserRepository{}
 	srv := micro.NewService(
 		micro.Registry(reg),
+		micro.Broker(broker),
 		micro.Name("chope.co.srv.user"),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
@@ -32,9 +35,10 @@ func main() {
 	srv.Init()
 	// fmt.Println("consul addres:", consulAddr)
 	dbops.Init(consulAddr)
-	pb.RegisterUserServiceHandler(srv.Server(), &service{repo: repo})
+	pub:=micro.NewPublisher("chope.co.pubsub.user",srv.Client())
+	pb.RegisterUserServiceHandler(srv.Server(), &service{repo: repo,pub:pub})
 	err := srv.Run()
 	if err != nil {
-		log.Fatal("run user service error")
+		log.Fatal("run user service error",err)
 	}
 }
