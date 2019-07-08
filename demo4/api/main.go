@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
-
 	"demo4/api/handler"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/micro/go-micro/web"

@@ -11,3 +11,5 @@ func GetUserById(id int32) (*pb.User, error) {
 	dbConn.First(&user)
 	return user, nil
 }
+
+func Create() {}

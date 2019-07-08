@@ -15,6 +15,6 @@ func main() {
 		micro.Registry(reg),
 	)
 	srv.Init()
-	micro.RegisterSubscriber("chope.co.pubsub.user", srv.Server(), new(Sub))
+	micro.RegisterSubscriber("chope.co.pubsub.user", srv.Server(),new(Sub))
 	srv.Run()
 }

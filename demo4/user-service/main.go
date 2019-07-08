@@ -34,6 +34,7 @@ func main() {
 	)
 	srv.Init()
 	// fmt.Println("consul addres:", consulAddr)
+
 	dbops.Init(consulAddr)
 	pub:=micro.NewPublisher("chope.co.pubsub.user",srv.Client())
 	pb.RegisterUserServiceHandler(srv.Server(), &service{repo: repo,pub:pub})
@@ -41,4 +42,5 @@ func main() {
 	if err != nil {
 		log.Fatal("run user service error",err)
 	}
+
 }

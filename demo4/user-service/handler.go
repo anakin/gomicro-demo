@@ -26,6 +26,10 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 		Timestamp: time.Now().Unix(),
 		Message:   fmt.Sprintf("user message,%s", user),
 	}
-	go srv.pub.Publish(context.Background(), ev)
+	fmt.Println(ev)
+	 err=srv.pub.Publish(context.Background(), ev)
+	if err != nil {
+		fmt.Println("pub error",err)
+	}
 	return nil
 }
