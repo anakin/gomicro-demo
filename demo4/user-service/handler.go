@@ -5,6 +5,7 @@ import (
 	rest "demo4/restaurant-service/proto/restaurant"
 	pb "demo4/user-service/proto/user"
 	"fmt"
+	"time"
 
 	micro "github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
@@ -31,11 +32,11 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 		return err
 	}
 	res.User = user
-	// ev := &pb.Event{
-	// 	Id:        "111",
-	// 	Timestamp: time.Now().Unix(),
-	// 	Message:   fmt.Sprintf("user message,%s", user),
-	// }
+	ev := &pb.Event{
+		Id:        "111",
+		Timestamp: time.Now().Unix(),
+		Message:   fmt.Sprintf("user message,%s", user),
+	}
 
 	rs, err := srv.restS.Book(context.Background(), &rest.Request{Id: "2345"})
 	if err != nil {
@@ -45,6 +46,6 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 	fmt.Println("got rest resp:", rs)
 
 	//发布broker消息
-	//go srv.pub.Publish(context.Background(), ev)
+	go srv.pub.Publish(context.Background(), ev)
 	return nil
 }

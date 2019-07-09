@@ -8,9 +8,9 @@ import (
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/broker/nats"
-	// "github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit"
+	"github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit"
 	"github.com/micro/go-micro/registry/consul"
-	// rl "github.com/juju/ratelimit"
+	rl "github.com/juju/ratelimit"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	reg := consul.NewRegistry()
 
 	//限流
-	// r:=rl.NewBucketWithRate(1,1)
+	r:=rl.NewBucketWithRate(1,1)
 
 	//异步的pub/sub使用nats
 	broker := nats.NewBroker()
@@ -29,7 +29,7 @@ breaker:=middleware.NewHytrixWrapper()
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name("chope.co.srv.user"),
-		// micro.WrapHandler(ratelimit.NewHandlerWrapper(r,false)),
+		micro.WrapHandler(ratelimit.NewHandlerWrapper(r,false)),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",
