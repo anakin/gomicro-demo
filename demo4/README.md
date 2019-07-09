@@ -1,5 +1,5 @@
 ## demo4
-### 读取consul配置、api代理、pub/sub、ratelimit、hystrix等
+### 读取consul配置、api代理、pub/sub、ratelimit、hystrix、logrus日志等
 1. 环境配置：
 
 	consul 127.0.0.1：8500(服务发现，配置管理)
