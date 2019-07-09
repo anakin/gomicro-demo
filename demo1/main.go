@@ -15,6 +15,7 @@ func main() {
 		web.Registry(reg),
 	)
 	srv.Init()
+
 	router := gin.Default()
 	r := router.Group("/user")
 	r.GET("/test", testhandler)
@@ -23,5 +24,6 @@ func main() {
 }
 
 func testhandler(c *gin.Context) {
+
 	fmt.Println("received user/test request")
 }

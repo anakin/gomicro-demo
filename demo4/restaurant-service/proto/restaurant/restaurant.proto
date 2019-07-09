@@ -1,0 +1,12 @@
+syntax="proto3";
+package restaurant;
+service BookService{
+rpc Book(Request) returns (Response){}
+}
+
+message Request{
+string id=1;
+}
+message Response{
+string msg=1;
+}
