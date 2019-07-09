@@ -4,49 +4,61 @@ import (
 	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
 	"log"
-
+"demo4/middleware"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/broker/nats"
-	"github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit"
+	// "github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit"
 	"github.com/micro/go-micro/registry/consul"
-	rl "github.com/juju/ratelimit"
+	// rl "github.com/juju/ratelimit"
 )
 
 func main() {
 	var consulAddr string
+
+	//服务发现使用consul
 	reg := consul.NewRegistry()
 
-	r:=rl.NewBucketWithRate(1,1)
+	//限流
+	// r:=rl.NewBucketWithRate(1,1)
+
+	//异步的pub/sub使用nats
 	broker := nats.NewBroker()
-	repo := &UserRepository{}
+breaker:=middleware.NewHytrixWrapper()
 	srv := micro.NewService(
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name("chope.co.srv.user"),
-		micro.WrapHandler(ratelimit.NewHandlerWrapper(r,false)),
+		// micro.WrapHandler(ratelimit.NewHandlerWrapper(r,false)),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",
 			EnvVar: "CONSUL_ADDRESS",
 			Value:  "127.0.0.1:8500",
 		}),
-
+		micro.WrapClient(breaker),
+		//从命令行获取consul服务的地址
 		micro.Action(func(ctx *cli.Context) {
 			consulAddr = ctx.String("consul_address")
 		}),
 	)
 	srv.Init()
-	// fmt.Println("consul addres:", consulAddr)
 
+	//初始化数据库
 	dbops.Init(consulAddr)
+
+	//注册broker
 	pub := micro.NewPublisher("chope.co.pubsub.user", srv.Client())
-	pb.RegisterUserServiceHandler(srv.Server(), &service{repo: repo, pub: pub})
+
+	
+	repo := &UserRepository{}
+
+	//注册服务
+	handler:=NewService(srv.Client(),repo,pub)
+	pb.RegisterUserServiceHandler(srv.Server(), handler)
 	err := srv.Run()
 
 	if err != nil {
-
 		log.Fatal("run user service error", err)
-
 	}
 }
