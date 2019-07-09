@@ -17,6 +17,7 @@ type service struct {
 	pub   micro.Publisher
 }
 
+//NewService factory
 func NewService(client client.Client, repo Repository, pub micro.Publisher) *service {
 	return &service{
 		repo:  repo,

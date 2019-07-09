@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"context"
+	"os"
+	"time"
+
 	"github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/metadata"
 	"github.com/micro/go-micro/server"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type logWrapper struct {
@@ -16,13 +18,19 @@ type logWrapper struct {
 func (l *logWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
 	md, _ := metadata.FromContext(ctx)
 	begin := time.Now()
+	file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		log.SetOutput(file)
+	} else {
+		log.Error("failed to open file")
+	}
 	logMsg := log.WithFields(log.Fields{
 		"ctx":     md,
 		"service": req.Service(),
 		"method":  req.Method(),
 	})
 	logMsg.Info("calling service")
-	err := l.Client.Call(ctx, req, rsp)
+	err = l.Client.Call(ctx, req, rsp)
 	if err != nil {
 		logMsg = logMsg.WithFields(log.Fields{
 			"error": err,
