@@ -41,10 +41,13 @@ func (l *logWrapper) Call(ctx context.Context, req client.Request, rsp interface
 	}).Info("called service")
 	return err
 }
+
+//LogClientWrapper log client wrapper
 func LogClientWrapper(c client.Client) client.Client {
 	return &logWrapper{c}
 }
 
+//LogHandlerWrapper log handler wrapper
 func LogHandlerWrapper(fn server.HandlerFunc) server.HandlerFunc {
 	return func(ctx context.Context, req server.Request, rsp interface{}) error {
 		md, _ := metadata.FromContext(ctx)

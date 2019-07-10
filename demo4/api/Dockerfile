@@ -1,0 +1,4 @@
+FROM golang
+WORKDIR .
+COPY ./api .
+EXPOSE 8081 8081
