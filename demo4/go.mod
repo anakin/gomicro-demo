@@ -3,7 +3,6 @@ module demo4
 go 1.12
 
 require (
-	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
@@ -13,6 +12,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible // indirect
 	github.com/gogo/protobuf v1.2.1
 	github.com/golang/protobuf v1.3.1
+	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.10
 	github.com/juju/ratelimit v1.0.1
 	github.com/lusis/go-slackbot v0.0.0-20180109053408-401027ccfef5 // indirect
