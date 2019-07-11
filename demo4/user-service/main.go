@@ -5,7 +5,6 @@ import (
 	"demo4/user-service/config"
 	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
-	"fmt"
 	"log"
 
 	rl "github.com/juju/ratelimit"
@@ -47,12 +46,14 @@ func main() {
 	)
 	srv.Init()
 
+	//from file
 	config.InitWithFile(".env.json")
 
-	fmt.Println(config.G_cfg)
+	//from consul
+	//config.InitWithConsul(consulAddr)
 
 	//初始化数据库
-	dbops.Init(consulAddr)
+	dbops.Init()
 
 	//注册broker
 	pub := micro.NewPublisher("chope.co.pubsub.user", srv.Client())

@@ -15,7 +15,7 @@ var (
 	err    error
 )
 
-func Init(address string) {
+func Init() {
 	cfg := config.G_cfg
 	if err != nil {
 		log.Fatal("read config fail")
