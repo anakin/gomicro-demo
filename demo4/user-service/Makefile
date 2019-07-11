@@ -4,4 +4,4 @@ docker:
 	docker build . -t chope/user-service:latest
 	rm api
 build:
-	CGO_ENABLED=0 GOOS=linux go build -o user-service
+	CGO_ENABLED=0 GOOS=linux go build -o ../build/user-service/user-service

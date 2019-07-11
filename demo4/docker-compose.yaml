@@ -3,19 +3,27 @@ version: "3"
 services:
   consul:
     image: progrium/consul:latest
-    command: -server -bootstrap -rejoin -ui
+    command: -server -bootstrap -rejoin
     ports:
       - "8300:8300"
       - "8400:8400"
       - "8500:8500"
       - "8600:53/udp"
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
   api:
-    build: ./api
+    build: ./build/api
     entrypoint: ./api --registry=consul --registry_address=consul:8500
     links:
       - consul
+      - nats
   user-service:
-    build: ./user-service
-    entrypoint: ./user-service --registry=consul --registry_address=consul:8500
+    build: ./build/user-service
+    entrypoint: ./user-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
+      - nats
