@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/micro/go-micro/config"
 	"github.com/micro/go-micro/config/source/consul"
+
+	"github.com/micro/go-micro/config/source/file"
+
+	"github.com/micro/go-micro/config"
 )
 
 //DBConfig Database config
@@ -44,20 +47,43 @@ type Cfg struct {
 	Memcache MemcacheConfig `json:"memcache`
 }
 
-//InitConfig ,init the config
-func InitConfig(address string) (*Cfg, error) {
+var (
+	G_cfg *Cfg
+	err   error
+)
+
+//consul
+func InitWithConsul(address string) {
 	consulSource := consul.NewSource(consul.WithAddress(address))
 	conf := config.NewConfig()
-
 	// Load file source
 	err := conf.Load(consulSource)
 	if err != nil {
 		fmt.Println("load err:", err)
 	}
-	var c Cfg
+	c := Cfg{}
 	err = conf.Get("micro", "config", "database", "user").Scan(&c)
 	if err != nil {
 		fmt.Println("get error:", err)
 	}
-	return &c, nil
+	G_cfg = &c
+}
+
+//InitWithFile,init the config from file
+func InitWithFile(filepath string) {
+	conf := config.NewConfig()
+	fileSource := file.NewSource(
+		file.WithPath(filepath),
+	)
+	// Load file source
+	err := conf.Load(fileSource)
+	if err != nil {
+		fmt.Println("load err:", err)
+	}
+	c := Cfg{}
+	err = conf.Scan(&c)
+	if err != nil {
+		fmt.Println("get error:", err)
+	}
+	G_cfg = &c
 }

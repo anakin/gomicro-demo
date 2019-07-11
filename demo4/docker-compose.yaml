@@ -3,7 +3,7 @@ version: "3"
 services:
   consul:
     image: progrium/consul:latest
-    command: -server -bootstrap -rejoin
+    command: -server -bootstrap -rejoin -ui
     ports:
       - "8300:8300"
       - "8400:8400"
@@ -14,5 +14,8 @@ services:
     entrypoint: ./api --registry=consul --registry_address=consul:8500
     links:
       - consul
-    ports:
-      - "8080:8080"
+  user-service:
+    build: ./user-service
+    entrypoint: ./user-service --registry=consul --registry_address=consul:8500
+    links:
+      - consul

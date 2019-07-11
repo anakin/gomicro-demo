@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"demo4/user-service/config"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -15,7 +16,7 @@ var (
 )
 
 func Init(address string) {
-	cfg, err := config.InitConfig(address)
+	cfg := config.G_cfg
 	if err != nil {
 		log.Fatal("read config fail")
 	}

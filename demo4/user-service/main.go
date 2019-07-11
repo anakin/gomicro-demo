@@ -2,8 +2,10 @@ package main
 
 import (
 	"demo4/middleware"
+	"demo4/user-service/config"
 	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
+	"fmt"
 	"log"
 
 	rl "github.com/juju/ratelimit"
@@ -44,6 +46,10 @@ func main() {
 		}),
 	)
 	srv.Init()
+
+	config.InitWithFile(".env.json")
+
+	fmt.Println(config.G_cfg)
 
 	//初始化数据库
 	dbops.Init(consulAddr)
