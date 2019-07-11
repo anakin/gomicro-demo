@@ -15,15 +15,33 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+  micro:
+    command: --registry=consul --registry_address=consul:8500 api --handler=http --namespace=chope.co.api
+    image: microhq/micro:latest
+    links:
+      - consul
+      - api
+    ports:
+      - "8080:8080"
   api:
     build: ./build/api
     entrypoint: ./api --registry=consul --registry_address=consul:8500
     links:
       - consul
       - nats
+      - user-service
+      - restaurant-service
   user-service:
     build: ./build/user-service
     entrypoint: ./user-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
       - nats
+      - restaurant-service
+  restaurant-service:
+    build: ./build/restaurant-service
+    entrypoint: ./restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
+    links:
+      - consul
+      - nats
+
