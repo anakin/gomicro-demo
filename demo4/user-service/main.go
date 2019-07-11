@@ -62,7 +62,7 @@ func main() {
 
 	//注册服务
 	handler := NewService(srv.Client(), repo, pub)
-	pb.RegisterUserServiceHandler(srv.Server(), handler)
+	_ = pb.RegisterUserServiceHandler(srv.Server(), handler)
 	err := srv.Run()
 
 	if err != nil {
