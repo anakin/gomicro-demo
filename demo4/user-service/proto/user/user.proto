@@ -19,7 +19,7 @@ message Request {
 
 message Response {
     User user = 1;
-    repeated Error errors = 3;
+    repeated Error errors = 2;
 }
 
 message Error {

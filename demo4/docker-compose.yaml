@@ -15,6 +15,23 @@ services:
       - "4222:4222"
       - "6222:6222"
       - "8222:8222"
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: test
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: test123
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost"]
+      timeout: 20s
+      retries: 10
+
   micro:
     command: --registry=consul --registry_address=consul:8500 api --handler=http --namespace=chope.co.api
     image: microhq/micro:latest
@@ -35,9 +52,11 @@ services:
     build: ./build/user-service
     entrypoint: ./user-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
+      - db
       - consul
       - nats
       - restaurant-service
+    command: dockerize -wait tcp://localhost:3306
   restaurant-service:
     build: ./build/restaurant-service
     entrypoint: ./restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
