@@ -29,6 +29,7 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
 	dbops.Init()
+	dbops.Migrate()
 	fmt.Println("receiveid /user/get request", req)
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
