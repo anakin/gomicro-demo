@@ -38,13 +38,20 @@ type MemcacheConfig struct {
 	Port int    `json:"port"`
 }
 
+//JaegerConfig opentracing endpoint
+type JaegerConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+
 //Cfg config struct
 type Cfg struct {
 	lock     sync.Mutex
 	conf     config.Config
 	Db       AllDBConfig    `json:"db"`
 	Redis    RedisConfig    `json:"redis"`
-	Memcache MemcacheConfig `json:"memcache`
+	Memcache MemcacheConfig `json:"memcache"`
+	Jaeger   JaegerConfig   `json:"jaeger"`
 }
 
 var (

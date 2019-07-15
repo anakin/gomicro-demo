@@ -1,17 +1,22 @@
 package middleware
 
 import (
+	"demo4/user-service/config"
+	"fmt"
+	"io"
+	"time"
+
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
-	"io"
-	"time"
 )
 
-const endpointURL = "localhost:6831"
+// const endpointURL = "localhost:6831"
 
 func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
-	cfg := jaegercfg.Configuration{
+	cfg := config.G_cfg
+	endpointURL := fmt.Sprintf("%s:%d", cfg.Jaeger.Host, cfg.Jaeger.Port)
+	jCfg := jaegercfg.Configuration{
 		ServiceName: servicename, // tracer name
 		Sampler: &jaegercfg.SamplerConfig{
 			Type:  jaeger.SamplerTypeConst,
@@ -28,7 +33,7 @@ func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
 	}
 	reporter := jaeger.NewRemoteReporter(sender) // create Jaeger reporter
 	// Initialize Opentracing tracer with Jaeger Reporter
-	tracer, closer, err := cfg.NewTracer(
+	tracer, closer, err := jCfg.NewTracer(
 		jaegercfg.Reporter(reporter),
 	)
 	return tracer, closer, err

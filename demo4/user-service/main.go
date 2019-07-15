@@ -55,6 +55,7 @@ func main() {
 	//初始化数据库
 	dbops.Init()
 	dbops.Migrate()
+	defer dbops.DBConn.Close()
 
 	//注册broker
 	pub := micro.NewPublisher("chope.co.pubsub.user", srv.Client())

@@ -1,6 +1,11 @@
 package redisops
 
-import "github.com/gomodule/redigo/redis"
+import (
+	"demo4/user-service/config"
+	"strconv"
+
+	"github.com/gomodule/redigo/redis"
+)
 
 var (
 	redisConn redis.Conn
@@ -8,7 +13,10 @@ var (
 )
 
 func init() {
-	if redisConn, err = redis.Dial("tcp", ":6779"); err != nil {
+	cfg := config.G_cfg
+	host := cfg.Redis.Host
+	port := strconv.Itoa(cfg.Redis.Port)
+	if redisConn, err = redis.Dial("tcp", host+":"+port); err != nil {
 		panic(err.Error())
 	}
 }
