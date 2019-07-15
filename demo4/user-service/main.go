@@ -3,7 +3,6 @@ package main
 import (
 	"demo4/middleware"
 	"demo4/user-service/config"
-	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
 	"log"
 
@@ -51,11 +50,6 @@ func main() {
 
 	//from consul
 	//config.InitWithConsul(consulAddr)
-
-	//初始化数据库
-	dbops.Init()
-	dbops.Migrate()
-	defer dbops.DBConn.Close()
 
 	//注册broker
 	pub := micro.NewPublisher("chope.co.pubsub.user", srv.Client())

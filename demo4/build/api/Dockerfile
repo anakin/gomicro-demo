@@ -1,3 +1,4 @@
 FROM golang
-WORKDIR .
+WORKDIR /
 COPY ./api .
+COPY .env.json . 

@@ -3,25 +3,51 @@ package main
 import (
 	"demo4/api/handler"
 	"fmt"
+	"log"
+
+	"demo4/api/config"
+	"demo4/tracer"
+
+	micro "github.com/micro/go-micro"
+	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/micro/go-micro/web"
+	opentracing "github.com/opentracing/opentracing-go"
 )
 
+const ServiceName = "chope.co.api.user"
+
 func main() {
+
+	//init config
+	config.InitWithFile(".env.json")
+	//opentracing
+	t, io, err := tracer.NewTracer(ServiceName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer io.Close()
+	opentracing.SetGlobalTracer(t)
+
+	//registry
 	reg := consul.NewRegistry()
 	srv := web.NewService(
-		web.Name("chope.co.api.user"),
+		web.Name(ServiceName),
 		web.Registry(reg),
 	)
+
 	_ = srv.Init()
-	h := handler.New(srv.Options().Service.Client())
+	service := micro.NewService(
+		micro.WrapClient(ocplugin.NewClientWrapper(t)),
+	)
+	h := handler.New(service.Client())
 	router := gin.Default()
 	r := router.Group("/user")
 	r.GET("/info", h.Info)
 	srv.Handle("/", router)
-	err := srv.Run()
+	err = srv.Run()
 	if err != nil {
 		fmt.Println(err)
 	}

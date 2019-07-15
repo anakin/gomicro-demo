@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	rest "demo4/restaurant-service/proto/restaurant"
+	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
 	"fmt"
 	"time"
@@ -27,6 +28,7 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
+	dbops.Init()
 	fmt.Println("receiveid /user/get request", req)
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {

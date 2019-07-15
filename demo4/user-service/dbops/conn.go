@@ -6,8 +6,6 @@ import (
 
 	"demo4/user-service/config"
 
-	pb "demo4/user-service/proto/user"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -30,8 +28,4 @@ func Init() {
 	if err != nil {
 		log.Fatal("connect to mysql error")
 	}
-}
-
-func Migrate() {
-	DBConn.AutoMigrate(&pb.User{})
 }
