@@ -1,11 +1,11 @@
 package dbops
 
 import (
-	"fmt"
-	"log"
-
 	"demo4/user-service/config"
 	pb "demo4/user-service/proto/user"
+	"fmt"
+	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -27,7 +27,10 @@ func Init() {
 	str := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True", user, password, host, port, dbName)
 	DBConn, err = gorm.Open("mysql", str)
 	if err != nil {
-		log.Fatal("connect to mysql error")
+		log.Println("connect to mysql error")
 	}
+	DBConn.DB().SetMaxOpenConns(100)
+	DBConn.DB().SetConnMaxLifetime(time.Hour)
+	DBConn.DB().SetMaxIdleConns(10)
 	DBConn.AutoMigrate(&pb.User{})
 }
