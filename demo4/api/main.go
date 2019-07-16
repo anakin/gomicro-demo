@@ -8,13 +8,13 @@ import (
 	"demo4/api/config"
 	"demo4/tracer"
 
-	micro "github.com/micro/go-micro"
+	"github.com/micro/go-micro"
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/micro/go-micro/web"
-	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go"
 )
 
 const ServiceName = "chope.co.api.user"
@@ -23,8 +23,9 @@ func main() {
 
 	//init config
 	config.InitWithFile(".env.json")
+	url := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
 	//opentracing
-	t, io, err := tracer.NewTracer(ServiceName)
+	t, io, err := tracer.NewTracer(ServiceName, url)
 	if err != nil {
 		log.Fatal(err)
 	}

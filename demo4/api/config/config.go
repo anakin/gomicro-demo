@@ -89,6 +89,7 @@ func InitWithFile(filepath string) {
 	}
 	c := Cfg{}
 	err = conf.Scan(&c)
+	fmt.Println("config file content:", c)
 	if err != nil {
 		fmt.Println("get error:", err)
 	}

@@ -1,8 +1,6 @@
 package tracer
 
 import (
-	"demo4/user-service/config"
-	"fmt"
 	"io"
 	"time"
 
@@ -13,9 +11,7 @@ import (
 
 // const endpointURL = "localhost:6831"
 
-func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
-	cfg := config.G_cfg
-	endpointURL := fmt.Sprintf("%s:%d", cfg.Jaeger.Host, cfg.Jaeger.Port)
+func NewTracer(servicename, url string) (opentracing.Tracer, io.Closer, error) {
 	jCfg := jaegercfg.Configuration{
 		ServiceName: servicename, // tracer name
 		Sampler: &jaegercfg.SamplerConfig{
@@ -27,7 +23,7 @@ func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
 			BufferFlushInterval: 1 * time.Second,
 		},
 	}
-	sender, err := jaeger.NewUDPTransport(endpointURL, 0) // set Jaeger report revice address
+	sender, err := jaeger.NewUDPTransport(url, 0) // set Jaeger report revice address
 	if err != nil {
 		return nil, nil, err
 	}

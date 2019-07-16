@@ -2,9 +2,15 @@ package main
 
 import (
 	"demo4/middleware"
+	"demo4/tracer"
 	"demo4/user-service/config"
 	pb "demo4/user-service/proto/user"
+	"fmt"
 	"log"
+
+	"github.com/opentracing/opentracing-go"
+
+	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
 	rl "github.com/juju/ratelimit"
 	"github.com/micro/cli"
@@ -14,14 +20,28 @@ import (
 	"github.com/micro/go-plugins/wrapper/ratelimiter/ratelimit"
 )
 
+const ServiceName = "chope.co.srv.user"
+
 func main() {
 	var consulAddr string
 
+	//from file
+	config.InitWithFile(".env.json")
+
+	url := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
 	//服务发现使用consul
 	reg := consul.NewRegistry()
 
 	//限流
 	r := rl.NewBucketWithRate(1, 1)
+
+	//opentracing
+	t, io, err := tracer.NewTracer(ServiceName, url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer io.Close()
+	opentracing.SetGlobalTracer(t)
 
 	//异步的pub/sub使用nats
 	broker := nats.NewBroker()
@@ -29,8 +49,8 @@ func main() {
 	srv := micro.NewService(
 		micro.Registry(reg),
 		micro.Broker(broker),
-		micro.Name("chope.co.srv.user"),
-		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper),
+		micro.Name(ServiceName),
+		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",
@@ -45,9 +65,6 @@ func main() {
 	)
 	srv.Init()
 
-	//from file
-	config.InitWithFile(".env.json")
-
 	//from consul
 	//config.InitWithConsul(consulAddr)
 
@@ -59,7 +76,7 @@ func main() {
 	//注册服务
 	handler := NewService(srv.Client(), repo, pub)
 	_ = pb.RegisterUserServiceHandler(srv.Server(), handler)
-	err := srv.Run()
+	err = srv.Run()
 
 	if err != nil {
 		log.Fatal("run user service error", err)
