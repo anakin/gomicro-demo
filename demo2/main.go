@@ -3,10 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 
 	pb "demo2/proto/user"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"
+	"github.com/micro/go-plugins/wrapper/monitoring/prometheus"
 )
 
 type User struct {
@@ -27,12 +33,22 @@ func main() {
 	srv := micro.NewService(
 		micro.Name("anakin.sun.api.user"),
 		micro.Registry(reg),
+		micro.WrapHandler(prometheus.NewHandlerWrapper()),
 	)
 	srv.Init()
-	pb.RegisterUserHandler(srv.Server(), new(User))
+	_ = pb.RegisterUserHandler(srv.Server(), new(User))
 
 	err := srv.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+func PrometheusBoot() {
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		err := http.ListenAndServe(":8085", nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }

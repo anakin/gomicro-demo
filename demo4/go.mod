@@ -22,6 +22,7 @@ require (
 	github.com/micro/go-plugins v1.1.1
 	github.com/micro/micro v1.7.1-0.20190627121529-410a2eba67f1
 	github.com/opentracing/opentracing-go v1.1.0
+	github.com/prometheus/client_golang v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/uber/jaeger-client-go v2.15.0+incompatible
 )

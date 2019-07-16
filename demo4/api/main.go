@@ -4,6 +4,11 @@ import (
 	"demo4/api/handler"
 	"fmt"
 	"log"
+	"net/http"
+
+	"github.com/micro/go-plugins/wrapper/monitoring/prometheus"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"demo4/api/config"
 	"demo4/tracer"
@@ -42,6 +47,7 @@ func main() {
 	_ = srv.Init()
 	service := micro.NewService(
 		micro.WrapClient(ocplugin.NewClientWrapper(t)),
+		micro.WrapHandler(prometheus.NewHandlerWrapper()),
 	)
 	h := handler.New(service.Client())
 	router := gin.Default()
@@ -52,4 +58,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+func PrometheusBoot() {
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		err := http.ListenAndServe(":8085", nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }

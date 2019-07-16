@@ -58,6 +58,14 @@ services:
       - jaeger
       - user-service
       - restaurant-service
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    links:
+      - api
   user-service:
     build: ./build/user-service
     entrypoint: ./user-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
