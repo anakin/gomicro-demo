@@ -1,5 +1,7 @@
 ## demo4
-### 读取consul配置、api代理、pub/sub、ratelimit、hystrix、logrus日志等
+### 读取consul配置、api代理、pub/sub、ratelimit、hystrix、logrus、prometheus监控日志等
+
+
 1. build 执行文件
 ```
 cd user-service
@@ -19,3 +21,6 @@ docker-compose up
 ```
 curl localhost:8080/user/info
 ```
+
+### TODO
+1. log内容整合进ELK
