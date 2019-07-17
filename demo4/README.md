@@ -21,6 +21,14 @@ docker-compose up
 ```
 curl localhost:8080/user/info
 ```
+4. consul UI
+http://localhost:8500
+
+5. jaeger UI
+http://localhost:16686
+
+6. prometheus UI
+http://localhost:9090
 
 ### TODO
 1. log内容整合进ELK
