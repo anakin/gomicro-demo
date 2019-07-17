@@ -58,6 +58,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	PrometheusBoot()
 }
 func PrometheusBoot() {
 	http.Handle("/metrics", promhttp.Handler())

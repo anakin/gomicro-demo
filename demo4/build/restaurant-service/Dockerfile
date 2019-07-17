@@ -1,3 +1,3 @@
 FROM golang
-WORKDIR .
-COPY restaurant-service .
+WORKDIR /
+COPY ./restaurant-service /

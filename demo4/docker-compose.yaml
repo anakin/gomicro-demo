@@ -78,8 +78,9 @@ services:
       - restaurant-service
   restaurant-service:
     build: ./build/restaurant-service
-    entrypoint: ./restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
+    entrypoint: /restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
       - nats
+      - jaeger
 

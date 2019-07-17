@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"demo4/restaurant-service/proto/restaurant"
+	"demo4/tracer"
 
 	"github.com/go-log/log"
 )
@@ -19,6 +20,7 @@ func (s *service) Book(ctx context.Context, req *restaurant.Request, rsp *restau
 		log.Logf("err:", err)
 		return err
 	}
+	tracer.Trace(ctx, req, res)
 	rsp.Msg = res
 	return nil
 }
