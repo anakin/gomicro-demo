@@ -21,6 +21,7 @@ import (
 )
 
 const ServiceName = "chope.co.srv.user"
+const BrokerServiceName = "chope.co.pubsub.user"
 
 func main() {
 	var consulAddr string
@@ -70,7 +71,7 @@ func main() {
 	//config.InitWithConsul(consulAddr)
 
 	//注册broker
-	pub := micro.NewPublisher("chope.co.pubsub.user", srv.Client())
+	pub := micro.NewPublisher(BrokerServiceName, srv.Client())
 
 	repo := &UserRepository{}
 

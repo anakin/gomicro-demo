@@ -32,3 +32,7 @@ http://localhost:9090
 
 ### TODO
 1. log内容整合进ELK
+2. nats版本的问题：
+```
+go mod edit -replace=github.com/nats-io/nats.go@v1.8.2-0.20190607221125-9f4d16fe7c2d=github.com/nats-io/nats.go@v1.8.1
+```
