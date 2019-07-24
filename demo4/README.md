@@ -2,7 +2,7 @@
 ### 读取consul配置、api代理、jwt、pub/sub、ratelimit、hystrix、logrus、prometheus监控日志等
 
 
-1. build 执行文件
+#### 1. build 执行文件
 ```
 cd user-service
 make build
@@ -13,11 +13,11 @@ make build
 cd restaurant-service
 make build
 ```
-2. 启动容器
+#### 2. 启动容器
 ```
 docker-compose up
 ```
-3. 访问
+#### 3. 访问
 
 创建用户：
 ```
@@ -27,18 +27,18 @@ post localhost:8080/user/create
 ```
 curl localhost:8080/user/info
 ```
-用户auth：
+获取jwt token(auth)：
 ```
-post localhost:8080/user/create 
+post localhost:8080/user/auth
 ```
 
-4. consul UI
+#### 4. consul UI
 http://localhost:8500
 
-5. jaeger UI
+#### 5. jaeger UI
 http://localhost:16686
 
-6. prometheus UI
+#### 6. prometheus UI
 http://localhost:9090
 
 ### TODO
