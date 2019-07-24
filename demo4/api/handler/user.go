@@ -6,9 +6,6 @@ import (
 
 	usersrv "demo4/user-service/proto/user"
 
-	"github.com/micro/go-micro/metadata"
-	opentracing "github.com/opentracing/opentracing-go"
-
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
 )
@@ -35,22 +32,9 @@ func (u *UserServiceHandler) Info(c *gin.Context) {
 }
 
 func (u *UserServiceHandler) Create(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c, "call")
-	md, ok := metadata.FromContext(ctx)
-	if !ok {
-		md = make(map[string]string)
-	}
-	defer span.Finish()
-	_ = opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md))
-	ctx = opentracing.ContextWithSpan(ctx, span)
-	ctx = metadata.NewContext(ctx, md)
+
 	req := &usersrv.User{Name: "anakin", Password: "123456", Company: "chope", Email: "anakin.sun@chope.co"}
-	span.SetTag("req", req)
-	res, err := u.userS.Create(ctx, req)
-	if err != nil {
-		span.SetTag("err", err)
-		return
-	}
-	span.SetTag("resp", res)
+	res, err := u.userS.Create(c, req)
+	tracer.Trace(c, req, res, err)
 	c.JSON(http.StatusOK, res)
 }
