@@ -18,6 +18,12 @@ make build
 docker-compose up
 ```
 3. 访问
+
+创建用户：
+```
+post localhost:8080/user/create 
+```
+获取用户：
 ```
 curl localhost:8080/user/info
 ```

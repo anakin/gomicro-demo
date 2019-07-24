@@ -37,7 +37,7 @@ func NewTracer(servicename, url string) (opentracing.Tracer, io.Closer, error) {
 	return tracer, closer, err
 }
 
-func Trace(ctx context.Context, req, res interface{}) {
+func Trace(ctx context.Context, req, res interface{}, err error) {
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		md = make(map[string]string)
@@ -48,6 +48,10 @@ func Trace(ctx context.Context, req, res interface{}) {
 	sp = opentracing.StartSpan("Get", opentracing.ChildOf(wireContext))
 	// record request
 	sp.SetTag("request:", req)
-	sp.SetTag("response:", res)
+	if err != nil {
+		sp.SetTag("err", err)
+	} else {
+		sp.SetTag("response:", res)
+	}
 	sp.Finish()
 }

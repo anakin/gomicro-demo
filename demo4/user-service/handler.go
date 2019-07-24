@@ -40,7 +40,7 @@ func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) e
 		return err
 	}
 	res.User = r
-	tracer.Trace(ctx, in, res)
+	tracer.Trace(ctx, in, res, err)
 	return nil
 }
 
@@ -66,7 +66,7 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 		return err
 	}
 	fmt.Println("got rest resp:", rs)
-	tracer.Trace(ctx, req, res)
+	tracer.Trace(ctx, req, res, err)
 	//发布broker消息
 	go srv.pub.Publish(ctx, ev)
 	return nil

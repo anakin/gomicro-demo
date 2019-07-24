@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"demo4/tracer"
 	"net/http"
 
 	usersrv "demo4/user-service/proto/user"
@@ -25,23 +26,11 @@ func New(client client.Client) *UserServiceHandler {
 }
 
 func (u *UserServiceHandler) Info(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c, "call")
-	md, ok := metadata.FromContext(ctx)
-	if !ok {
-		md = make(map[string]string)
-	}
-	defer span.Finish()
-	_ = opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md))
-	ctx = opentracing.ContextWithSpan(ctx, span)
-	ctx = metadata.NewContext(ctx, md)
+
 	req := &usersrv.User{Id: 1}
-	span.SetTag("req", req)
-	res, err := u.userS.Get(ctx, req)
-	if err != nil {
-		span.SetTag("err", err)
-		return
-	}
-	span.SetTag("resp", res)
+	res, err := u.userS.Get(c, req)
+	tracer.Trace(c, req, res, err)
+
 	c.JSON(http.StatusOK, res)
 }
 
