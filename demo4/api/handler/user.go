@@ -31,12 +31,33 @@ func (u *UserServiceHandler) Info(c *gin.Context) {
 		md = make(map[string]string)
 	}
 	defer span.Finish()
-	opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md))
+	_ = opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md))
 	ctx = opentracing.ContextWithSpan(ctx, span)
 	ctx = metadata.NewContext(ctx, md)
 	req := &usersrv.User{Id: 1}
 	span.SetTag("req", req)
 	res, err := u.userS.Get(ctx, req)
+	if err != nil {
+		span.SetTag("err", err)
+		return
+	}
+	span.SetTag("resp", res)
+	c.JSON(http.StatusOK, res)
+}
+
+func (u *UserServiceHandler) Create(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c, "call")
+	md, ok := metadata.FromContext(ctx)
+	if !ok {
+		md = make(map[string]string)
+	}
+	defer span.Finish()
+	_ = opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md))
+	ctx = opentracing.ContextWithSpan(ctx, span)
+	ctx = metadata.NewContext(ctx, md)
+	req := &usersrv.User{Name: "anakin", Password: "123456", Company: "chope", Email: "anakin.sun@chope.co"}
+	span.SetTag("req", req)
+	res, err := u.userS.Create(ctx, req)
 	if err != nil {
 		span.SetTag("err", err)
 		return

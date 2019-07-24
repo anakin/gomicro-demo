@@ -12,6 +12,7 @@ func GetUserById(id int32) (*pb.User, error) {
 	return user, nil
 }
 
-func Create(user *pb.User) error {
-	return nil
+func Create(user *pb.User) int32 {
+	DBConn.Save(user)
+	return user.Id
 }

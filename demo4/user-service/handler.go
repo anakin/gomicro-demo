@@ -4,10 +4,11 @@ import (
 	"context"
 	rest "demo4/restaurant-service/proto/restaurant"
 	"demo4/tracer"
-	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
 	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
@@ -28,8 +29,23 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 	}
 }
 
+func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) error {
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	in.Password = string(hashedPass)
+	r, err := srv.repo.Create(in)
+	if err != nil {
+		return err
+	}
+	res.User = r
+	tracer.Trace(ctx, in, res)
+	return nil
+}
+
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
-	dbops.Init()
+	//dbops.Init()
 
 	fmt.Println("receiveid /user/get request", req)
 
@@ -50,9 +66,8 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 		return err
 	}
 	fmt.Println("got rest resp:", rs)
-
 	tracer.Trace(ctx, req, res)
 	//发布broker消息
-	go srv.pub.Publish(context.Background(), ev)
+	go srv.pub.Publish(ctx, ev)
 	return nil
 }

@@ -35,6 +35,7 @@ var _ server.Option
 
 type UserService interface {
 	Get(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
+	Create(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
 }
 
 type userService struct {
@@ -65,15 +66,27 @@ func (c *userService) Get(ctx context.Context, in *User, opts ...client.CallOpti
 	return out, nil
 }
 
+func (c *userService) Create(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error) {
+	req := c.c.NewRequest(c.name, "UserService.Create", in)
+	out := new(Response)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for UserService service
 
 type UserServiceHandler interface {
 	Get(context.Context, *User, *Response) error
+	Create(context.Context, *User, *Response) error
 }
 
 func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts ...server.HandlerOption) error {
 	type userService interface {
 		Get(ctx context.Context, in *User, out *Response) error
+		Create(ctx context.Context, in *User, out *Response) error
 	}
 	type UserService struct {
 		userService
@@ -88,4 +101,8 @@ type userServiceHandler struct {
 
 func (h *userServiceHandler) Get(ctx context.Context, in *User, out *Response) error {
 	return h.UserServiceHandler.Get(ctx, in, out)
+}
+
+func (h *userServiceHandler) Create(ctx context.Context, in *User, out *Response) error {
+	return h.UserServiceHandler.Create(ctx, in, out)
 }

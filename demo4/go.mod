@@ -25,4 +25,5 @@ require (
 	github.com/prometheus/client_golang v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/uber/jaeger-client-go v2.15.0+incompatible
+	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
 )
