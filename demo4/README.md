@@ -1,5 +1,5 @@
 ## demo4
-### 读取consul配置、api代理、pub/sub、ratelimit、hystrix、logrus、prometheus监控日志等
+### 读取consul配置、api代理、jwt、pub/sub、ratelimit、hystrix、logrus、prometheus监控日志等
 
 
 1. build 执行文件
@@ -27,6 +27,11 @@ post localhost:8080/user/create
 ```
 curl localhost:8080/user/info
 ```
+用户auth：
+```
+post localhost:8080/user/create 
+```
+
 4. consul UI
 http://localhost:8500
 
