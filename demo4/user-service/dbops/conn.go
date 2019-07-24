@@ -2,7 +2,6 @@ package dbops
 
 import (
 	"demo4/user-service/config"
-	pb "demo4/user-service/proto/user"
 	"fmt"
 	"log"
 	"time"
@@ -32,5 +31,5 @@ func Init() {
 	DBConn.DB().SetMaxOpenConns(100)
 	DBConn.DB().SetConnMaxLifetime(time.Hour)
 	DBConn.DB().SetMaxIdleConns(10)
-	DBConn.AutoMigrate(&pb.User{})
+	DBConn.Set("gorm:table_options", "ENGINE=InnoDB,CHARSET=utf8mb4").AutoMigrate(User{}).AddUniqueIndex("idx_email", "email")
 }

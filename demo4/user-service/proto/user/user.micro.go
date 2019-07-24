@@ -36,6 +36,7 @@ var _ server.Option
 type UserService interface {
 	Get(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
 	Create(ctx context.Context, in *User, opts ...client.CallOption) (*Response, error)
+	Auth(ctx context.Context, in *User, opts ...client.CallOption) (*Token, error)
 }
 
 type userService struct {
@@ -76,17 +77,29 @@ func (c *userService) Create(ctx context.Context, in *User, opts ...client.CallO
 	return out, nil
 }
 
+func (c *userService) Auth(ctx context.Context, in *User, opts ...client.CallOption) (*Token, error) {
+	req := c.c.NewRequest(c.name, "UserService.Auth", in)
+	out := new(Token)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for UserService service
 
 type UserServiceHandler interface {
 	Get(context.Context, *User, *Response) error
 	Create(context.Context, *User, *Response) error
+	Auth(context.Context, *User, *Token) error
 }
 
 func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts ...server.HandlerOption) error {
 	type userService interface {
 		Get(ctx context.Context, in *User, out *Response) error
 		Create(ctx context.Context, in *User, out *Response) error
+		Auth(ctx context.Context, in *User, out *Token) error
 	}
 	type UserService struct {
 		userService
@@ -105,4 +118,8 @@ func (h *userServiceHandler) Get(ctx context.Context, in *User, out *Response) e
 
 func (h *userServiceHandler) Create(ctx context.Context, in *User, out *Response) error {
 	return h.UserServiceHandler.Create(ctx, in, out)
+}
+
+func (h *userServiceHandler) Auth(ctx context.Context, in *User, out *Token) error {
+	return h.UserServiceHandler.Auth(ctx, in, out)
 }

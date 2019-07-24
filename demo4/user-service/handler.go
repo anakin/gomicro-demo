@@ -18,6 +18,7 @@ type service struct {
 	repo  Repository
 	restS rest.BookService
 	pub   micro.Publisher
+	token TokenService
 }
 
 //NewService factory
@@ -26,17 +27,20 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 		repo:  repo,
 		restS: rest.NewBookService("chope.co.srv.restaurant", client),
 		pub:   pub,
+		token: TokenService{},
 	}
 }
 
 func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 	if err != nil {
+		tracer.Trace(ctx, req, res, err)
 		return err
 	}
 	in.Password = string(hashedPass)
 	r, err := srv.repo.Create(in)
 	if err != nil {
+		tracer.Trace(ctx, req, res, err)
 		return err
 	}
 	res.User = r
@@ -45,12 +49,9 @@ func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) e
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
-	//dbops.Init()
-
-	fmt.Println("receiveid /user/get request", req)
-
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
+		tracer.Trace(ctx, req, res, err)
 		return err
 	}
 	res.User = user
@@ -62,12 +63,33 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 
 	rs, err := srv.restS.Book(ctx, &rest.Request{Id: "2345"})
 	if err != nil {
-		fmt.Println("req restaurant error,", err)
+		tracer.Trace(ctx, req, res, err)
 		return err
 	}
 	fmt.Println("got rest resp:", rs)
 	tracer.Trace(ctx, req, res, err)
 	//发布broker消息
 	go srv.pub.Publish(ctx, ev)
+	return nil
+}
+
+func (srv *service) Auth(ctx context.Context, in *pb.User, out *pb.Token) error {
+	user, err := srv.repo.GetByEmail(in.Email)
+	if err != nil {
+		tracer.Trace(ctx, in, out, err)
+		return err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(in.Password))
+	if err != nil {
+		tracer.Trace(ctx, in, out, err)
+		return err
+	}
+	token, err := srv.token.Encode(user)
+	if err != nil {
+		tracer.Trace(ctx, in, out, err)
+		return err
+	}
+	out.Token = token
+	tracer.Trace(ctx, in, out, err)
 	return nil
 }

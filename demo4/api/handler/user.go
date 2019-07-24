@@ -38,3 +38,13 @@ func (u *UserServiceHandler) Create(c *gin.Context) {
 	tracer.Trace(c, req, res, err)
 	c.JSON(http.StatusOK, res)
 }
+
+func (u *UserServiceHandler) Auth(c *gin.Context) {
+	req := &usersrv.User{
+		Email:    "anakin.sun@chope.co",
+		Password: "123456",
+	}
+	res, err := u.userS.Auth(c, req)
+	tracer.Trace(c, req, res, err)
+	c.JSON(http.StatusOK, res)
+}

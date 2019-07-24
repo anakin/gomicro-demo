@@ -54,6 +54,7 @@ func main() {
 	r := router.Group("/user")
 	r.GET("/info", h.Info)
 	r.POST("/create", h.Create)
+	r.POST("/auth", h.Auth)
 	srv.Handle("/", router)
 	err = srv.Run()
 	if err != nil {
