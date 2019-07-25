@@ -31,8 +31,8 @@ func main() {
 		micro.RegisterInterval(time.Second*10),
 		micro.RegisterTTL(time.Second*30),
 		micro.Registry(reg),
-		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
-		micro.WrapClient(ocplugin.NewClientWrapper(opentracing.GlobalTracer())),
+		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer()), middleware.LogHandlerWrapper),
+		micro.WrapClient(ocplugin.NewClientWrapper(opentracing.GlobalTracer()), middleware.LogClientWrapper),
 	)
 	srv.Init()
 	repo := &BookRepository{}

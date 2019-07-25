@@ -5,7 +5,8 @@ import (
 	"demo4/user-service/config"
 	pb "demo4/user-service/proto/user"
 	"fmt"
-	"log"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/opentracing/opentracing-go"
 
@@ -21,6 +22,13 @@ import (
 
 const ServiceName = "chope.co.srv.user"
 const BrokerServiceName = "chope.co.pubsub.user"
+
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02T15:04:05.000",
+		FullTimestamp:   true,
+	})
+}
 
 func main() {
 	var consulAddr string
@@ -38,7 +46,7 @@ func main() {
 	//opentracing
 	t, io, err := middleware.NewTracer(ServiceName, url)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	defer io.Close()
 	opentracing.SetGlobalTracer(t)
@@ -51,7 +59,7 @@ func main() {
 		micro.Broker(broker),
 		micro.Name(ServiceName),
 		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
-		micro.WrapClient(ocplugin.NewClientWrapper(opentracing.GlobalTracer())),
+		micro.WrapClient(ocplugin.NewClientWrapper(opentracing.GlobalTracer()), middleware.LogClientWrapper),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",
@@ -80,6 +88,6 @@ func main() {
 	err = srv.Run()
 
 	if err != nil {
-		log.Fatal("run user service error", err)
+		logrus.Fatal("run user service error", err)
 	}
 }

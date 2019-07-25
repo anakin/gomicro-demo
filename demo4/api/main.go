@@ -3,8 +3,9 @@ package main
 import (
 	"demo4/api/handler"
 	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/micro/go-plugins/wrapper/monitoring/prometheus"
 
@@ -25,6 +26,12 @@ import (
 
 const ServiceName = "chope.co.api.user"
 
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02T15:04:05.000",
+		FullTimestamp:   true,
+	})
+}
 func main() {
 
 	//init config
@@ -33,7 +40,7 @@ func main() {
 	//opentracing
 	t, io, err := middleware.NewTracer(ServiceName, url)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	defer io.Close()
 	opentracing.SetGlobalTracer(t)
@@ -47,8 +54,8 @@ func main() {
 
 	_ = srv.Init()
 	service := micro.NewService(
-		micro.WrapClient(ocplugin.NewClientWrapper(t)),
-		micro.WrapHandler(prometheus.NewHandlerWrapper()),
+		micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
+		micro.WrapHandler(prometheus.NewHandlerWrapper(), middleware.LogHandlerWrapper),
 	)
 	h := handler.New(service.Client())
 	router := gin.Default()
@@ -59,7 +66,7 @@ func main() {
 	srv.Handle("/", router)
 	err = srv.Run()
 	if err != nil {
-		fmt.Println(err)
+		logrus.Fatal(err)
 	}
 	PrometheusBoot()
 }
@@ -68,7 +75,7 @@ func PrometheusBoot() {
 	go func() {
 		err := http.ListenAndServe(":8085", nil)
 		if err != nil {
-			log.Println(err)
+			logrus.Println(err)
 		}
 	}()
 }

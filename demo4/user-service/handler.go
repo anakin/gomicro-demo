@@ -6,8 +6,9 @@ import (
 	rest "demo4/restaurant-service/proto/restaurant"
 	pb "demo4/user-service/proto/user"
 	"fmt"
-	"log"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -64,7 +65,7 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (er
 	if err != nil {
 		return err
 	}
-	log.Println("got rest resp:", rs)
+	logrus.Println("got rest resp:", rs)
 	//发布broker消息
 	go srv.pub.Publish(ctx, ev)
 	return nil

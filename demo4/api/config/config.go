@@ -1,10 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/micro/go-micro/config/source/consul"
+	"github.com/sirupsen/logrus"
 
 	"github.com/micro/go-micro/config/source/file"
 
@@ -66,12 +66,12 @@ func InitWithConsul(address string) {
 	// Load file source
 	err := conf.Load(consulSource)
 	if err != nil {
-		fmt.Println("load err:", err)
+		logrus.Println("load err:", err)
 	}
 	c := Cfg{}
 	err = conf.Get("micro", "config", "database", "user").Scan(&c)
 	if err != nil {
-		fmt.Println("get error:", err)
+		logrus.Println("get error:", err)
 	}
 	G_cfg = &c
 }
@@ -85,13 +85,12 @@ func InitWithFile(filepath string) {
 	// Load file source
 	err := conf.Load(fileSource)
 	if err != nil {
-		fmt.Println("load err:", err)
+		logrus.Println("load err:", err)
 	}
 	c := Cfg{}
 	err = conf.Scan(&c)
-	fmt.Println("config file content:", c)
 	if err != nil {
-		fmt.Println("get error:", err)
+		logrus.Println("get error:", err)
 	}
 	G_cfg = &c
 }
