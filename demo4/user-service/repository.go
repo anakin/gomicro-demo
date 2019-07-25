@@ -25,7 +25,10 @@ func (u *UserRepository) Create(uinfo *pb.User) (*pb.User, error) {
 		Email:    uinfo.Email,
 		Password: uinfo.Password,
 	}
-	id := dbops.Create(uu)
+	id, err := dbops.Create(uu)
+	if err != nil {
+		return nil, err
+	}
 	user := &pb.User{
 		Id: id,
 	}

@@ -23,14 +23,20 @@ func GetUserById(id int32) (*pb.User, error) {
 	return u, nil
 }
 
-func Create(user *User) int32 {
-	DBConn.Save(user)
-	return user.Id
+func Create(user *User) (int32, error) {
+	err := DBConn.Save(user).Error
+	if err != nil {
+		return 0, err
+	}
+	return user.Id, nil
 }
 
 func GetUserByEmail(email string) (*pb.User, error) {
 	user := &pb.User{}
-	DBConn.Debug().Where(&User{Email: email}).First(&user)
+	err := DBConn.Where(&User{Email: email}).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
 	u := &pb.User{
 		Name:     user.Name,
 		Email:    user.Email,

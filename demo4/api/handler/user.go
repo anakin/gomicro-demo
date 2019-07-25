@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"demo4/tracer"
+	"demo4/middleware"
 	"net/http"
 
 	usersrv "demo4/user-service/proto/user"
@@ -26,8 +26,7 @@ func (u *UserServiceHandler) Info(c *gin.Context) {
 
 	req := &usersrv.User{Id: 1}
 	res, err := u.userS.Get(c, req)
-	tracer.Trace(c, req, res, err)
-
+	middleware.Trace(c, req, res, err)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -35,7 +34,7 @@ func (u *UserServiceHandler) Create(c *gin.Context) {
 
 	req := &usersrv.User{Name: "anakin", Password: "123456", Company: "chope", Email: "anakin.sun@chope.co"}
 	res, err := u.userS.Create(c, req)
-	tracer.Trace(c, req, res, err)
+	middleware.Trace(c, req, res, err)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -45,6 +44,6 @@ func (u *UserServiceHandler) Auth(c *gin.Context) {
 		Password: "123456",
 	}
 	res, err := u.userS.Auth(c, req)
-	tracer.Trace(c, req, res, err)
+	middleware.Trace(c, req, res, err)
 	c.JSON(http.StatusOK, res)
 }

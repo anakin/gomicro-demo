@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"demo4/middleware"
 	rest "demo4/restaurant-service/proto/restaurant"
-	"demo4/tracer"
 	pb "demo4/user-service/proto/user"
 	"fmt"
+	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -31,27 +32,25 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 	}
 }
 
-func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) error {
+func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) (err error) {
+	defer middleware.Trace(ctx, in, res, err)
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 	if err != nil {
-		tracer.Trace(ctx, req, res, err)
-		return err
+		return
 	}
 	in.Password = string(hashedPass)
 	r, err := srv.repo.Create(in)
 	if err != nil {
-		tracer.Trace(ctx, req, res, err)
-		return err
+		return
 	}
 	res.User = r
-	tracer.Trace(ctx, in, res, err)
 	return nil
 }
 
-func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
+func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (err error) {
+	defer middleware.Trace(ctx, req, res, err)
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
-		tracer.Trace(ctx, req, res, err)
 		return err
 	}
 	res.User = user
@@ -63,33 +62,28 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) err
 
 	rs, err := srv.restS.Book(ctx, &rest.Request{Id: "2345"})
 	if err != nil {
-		tracer.Trace(ctx, req, res, err)
 		return err
 	}
-	fmt.Println("got rest resp:", rs)
-	tracer.Trace(ctx, req, res, err)
+	log.Println("got rest resp:", rs)
 	//发布broker消息
 	go srv.pub.Publish(ctx, ev)
 	return nil
 }
 
-func (srv *service) Auth(ctx context.Context, in *pb.User, out *pb.Token) error {
+func (srv *service) Auth(ctx context.Context, in *pb.User, out *pb.Token) (err error) {
+	defer middleware.Trace(ctx, in, out, err)
 	user, err := srv.repo.GetByEmail(in.Email)
 	if err != nil {
-		tracer.Trace(ctx, in, out, err)
 		return err
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(in.Password))
 	if err != nil {
-		tracer.Trace(ctx, in, out, err)
 		return err
 	}
 	token, err := srv.token.Encode(user)
 	if err != nil {
-		tracer.Trace(ctx, in, out, err)
 		return err
 	}
 	out.Token = token
-	tracer.Trace(ctx, in, out, err)
 	return nil
 }

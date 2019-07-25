@@ -1,8 +1,8 @@
 package main
 
 import (
+	"demo4/middleware"
 	pb "demo4/restaurant-service/proto/restaurant"
-	"demo4/tracer"
 	"log"
 	"time"
 
@@ -18,7 +18,7 @@ func main() {
 	//opentracing
 	//TODO from config file
 	url := "jaeger:6831"
-	t, io, err := tracer.NewTracer(ServiceName, url)
+	t, io, err := middleware.NewTracer(ServiceName, url)
 	if err != nil {
 		log.Fatal(err)
 	}

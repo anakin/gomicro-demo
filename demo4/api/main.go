@@ -11,10 +11,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"demo4/api/config"
-	"demo4/tracer"
 
 	"github.com/micro/go-micro"
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
+
+	"demo4/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
@@ -30,7 +31,7 @@ func main() {
 	config.InitWithFile(".env.json")
 	url := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
 	//opentracing
-	t, io, err := tracer.NewTracer(ServiceName, url)
+	t, io, err := middleware.NewTracer(ServiceName, url)
 	if err != nil {
 		log.Fatal(err)
 	}

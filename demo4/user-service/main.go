@@ -2,7 +2,6 @@ package main
 
 import (
 	"demo4/middleware"
-	"demo4/tracer"
 	"demo4/user-service/config"
 	pb "demo4/user-service/proto/user"
 	"fmt"
@@ -37,7 +36,7 @@ func main() {
 	r := rl.NewBucketWithRate(1, 1)
 
 	//opentracing
-	t, io, err := tracer.NewTracer(ServiceName, url)
+	t, io, err := middleware.NewTracer(ServiceName, url)
 	if err != nil {
 		log.Fatal(err)
 	}
