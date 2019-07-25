@@ -34,7 +34,7 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 }
 
 func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) (err error) {
-	defer middleware.Trace(ctx, in, res, err)
+	defer middleware.Trace(ctx, "Create", in, res, err)
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return
@@ -49,7 +49,7 @@ func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) (
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (err error) {
-	defer middleware.Trace(ctx, req, res, err)
+	defer middleware.Trace(ctx, "Get", req, res, err)
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
 		return err
@@ -67,12 +67,17 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (er
 	}
 	logrus.Println("got rest resp:", rs)
 	//发布broker消息
-	go srv.pub.Publish(ctx, ev)
+	go func() {
+		err := srv.pub.Publish(ctx, ev)
+		if err != nil {
+			logrus.Error(err)
+		}
+	}()
 	return nil
 }
 
 func (srv *service) Auth(ctx context.Context, in *pb.User, out *pb.Token) (err error) {
-	defer middleware.Trace(ctx, in, out, err)
+	defer middleware.Trace(ctx, "Auth", in, out, err)
 	user, err := srv.repo.GetByEmail(in.Email)
 	if err != nil {
 		return err

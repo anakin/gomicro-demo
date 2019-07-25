@@ -13,7 +13,7 @@ type service struct {
 }
 
 func (s *service) Book(ctx context.Context, req *restaurant.Request, rsp *restaurant.Response) (err error) {
-	defer middleware.Trace(ctx, req, rsp, err)
+	defer middleware.Trace(ctx, "Book", req, rsp, err)
 	id := req.Id
 	log.Logf("receiveid id:", id)
 	res, err := s.repo.Book(id)

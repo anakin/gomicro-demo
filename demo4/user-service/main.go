@@ -2,13 +2,9 @@ package main
 
 import (
 	"demo4/middleware"
-	"demo4/user-service/config"
 	pb "demo4/user-service/proto/user"
-	"fmt"
 
 	"github.com/sirupsen/logrus"
-
-	"github.com/opentracing/opentracing-go"
 
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
@@ -33,33 +29,33 @@ func init() {
 func main() {
 	var consulAddr string
 
-	//from file
-	config.InitWithFile(".env.json")
+	//config from file
+	middleware.InitWithFile(".env.json")
 
-	url := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
-	//服务发现使用consul
-	reg := consul.NewRegistry()
+	//opentracing
+	tracer, closer, err := middleware.NewTracer(ServiceName)
+	if err != nil {
+		logrus.Error(err)
+	}
+	defer closer.Close()
 
 	//限流
 	r := rl.NewBucketWithRate(1, 1)
 
-	//opentracing
-	t, io, err := middleware.NewTracer(ServiceName, url)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	defer io.Close()
-	opentracing.SetGlobalTracer(t)
+	//registry
+	reg := consul.NewRegistry()
 
 	//异步的pub/sub使用nats
 	broker := nats.NewBroker()
+
+	//breaker
 	breaker := middleware.NewHytrixWrapper()
 	srv := micro.NewService(
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name(ServiceName),
-		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
-		micro.WrapClient(ocplugin.NewClientWrapper(opentracing.GlobalTracer()), middleware.LogClientWrapper),
+		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(tracer)),
+		micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",

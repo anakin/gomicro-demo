@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
@@ -13,7 +14,10 @@ import (
 
 // const endpointURL = "localhost:6831"
 
-func NewTracer(servicename, url string) (opentracing.Tracer, io.Closer, error) {
+func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
+	InitWithFile(".env.json")
+	url := fmt.Sprintf("%s:%d", G_cfg.Jaeger.Host, G_cfg.Jaeger.Port)
+	//opentracing
 	jCfg := jaegercfg.Configuration{
 		ServiceName: servicename, // tracer name
 		Sampler: &jaegercfg.SamplerConfig{
@@ -34,10 +38,11 @@ func NewTracer(servicename, url string) (opentracing.Tracer, io.Closer, error) {
 	tracer, closer, err := jCfg.NewTracer(
 		jaegercfg.Reporter(reporter),
 	)
+	opentracing.SetGlobalTracer(tracer)
 	return tracer, closer, err
 }
 
-func Trace(ctx context.Context, req, res interface{}, err error) {
+func Trace(ctx context.Context, method string, req, res interface{}, err error) {
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
 		md = make(map[string]string)
@@ -45,7 +50,7 @@ func Trace(ctx context.Context, req, res interface{}, err error) {
 	var sp opentracing.Span
 	wireContext, _ := opentracing.GlobalTracer().Extract(opentracing.TextMap, opentracing.TextMapCarrier(md))
 	// create new span and bind with context
-	sp = opentracing.StartSpan("Get", opentracing.ChildOf(wireContext))
+	sp = opentracing.StartSpan(method, opentracing.ChildOf(wireContext))
 	// record request
 	sp.SetTag("request:", req)
 	if err != nil {

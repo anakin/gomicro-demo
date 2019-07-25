@@ -26,7 +26,7 @@ func (u *UserServiceHandler) Info(c *gin.Context) {
 
 	req := &usersrv.User{Id: 1}
 	res, err := u.userS.Get(c, req)
-	middleware.Trace(c, req, res, err)
+	middleware.Trace(c, "Info", req, res, err)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -34,7 +34,7 @@ func (u *UserServiceHandler) Create(c *gin.Context) {
 
 	req := &usersrv.User{Name: "anakin", Password: "123456", Company: "chope", Email: "anakin.sun@chope.co"}
 	res, err := u.userS.Create(c, req)
-	middleware.Trace(c, req, res, err)
+	middleware.Trace(c, "Create", req, res, err)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -44,6 +44,6 @@ func (u *UserServiceHandler) Auth(c *gin.Context) {
 		Password: "123456",
 	}
 	res, err := u.userS.Auth(c, req)
-	middleware.Trace(c, req, res, err)
+	middleware.Trace(c, "Auth", req, res, err)
 	c.JSON(http.StatusOK, res)
 }

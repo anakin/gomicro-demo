@@ -2,7 +2,6 @@ package main
 
 import (
 	"demo4/api/handler"
-	"fmt"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -10,8 +9,6 @@ import (
 	"github.com/micro/go-plugins/wrapper/monitoring/prometheus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"demo4/api/config"
 
 	"github.com/micro/go-micro"
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
@@ -21,7 +18,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/micro/go-micro/web"
-	"github.com/opentracing/opentracing-go"
 )
 
 const ServiceName = "chope.co.api.user"
@@ -33,17 +29,13 @@ func init() {
 	})
 }
 func main() {
-
-	//init config
-	config.InitWithFile(".env.json")
-	url := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
+	middleware.InitWithFile(".env.json")
 	//opentracing
-	t, io, err := middleware.NewTracer(ServiceName, url)
+	tracer, closer, err := middleware.NewTracer(ServiceName)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Error(err)
 	}
-	defer io.Close()
-	opentracing.SetGlobalTracer(t)
+	defer closer.Close()
 
 	//registry
 	reg := consul.NewRegistry()
@@ -54,8 +46,8 @@ func main() {
 
 	_ = srv.Init()
 	service := micro.NewService(
-		micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
-		micro.WrapHandler(prometheus.NewHandlerWrapper(), middleware.LogHandlerWrapper),
+		micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
+		micro.WrapHandler(prometheus.NewHandlerWrapper(), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(tracer)),
 	)
 	h := handler.New(service.Client())
 	router := gin.Default()

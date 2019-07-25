@@ -56,8 +56,6 @@ services:
       - consul
       - nats
       - jaeger
-      - user-service
-      - restaurant-service
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -75,10 +73,16 @@ services:
       - consul
       - nats
       - jaeger
-      - restaurant-service
   restaurant-service:
     build: ./build/restaurant-service
     entrypoint: ./restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
+    links:
+      - consul
+      - nats
+      - jaeger
+  diner-service:
+    build: ./build/diner-service
+    entrypoint: ./diner-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
       - nats
