@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"demo4/middleware"
+	"demo4/lib/tracer"
 	rest "demo4/restaurant-service/proto/restaurant"
 	pb "demo4/user-service/proto/user"
 	"fmt"
@@ -34,7 +34,7 @@ func NewService(client client.Client, repo Repository, pub micro.Publisher) *ser
 }
 
 func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) (err error) {
-	defer middleware.Trace(ctx, "Create", in, res, err)
+	defer tracer.Trace(ctx, "Create", in, res, err)
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return
@@ -49,7 +49,7 @@ func (srv *service) Create(ctx context.Context, in *pb.User, res *pb.Response) (
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (err error) {
-	defer middleware.Trace(ctx, "Get", req, res, err)
+	defer tracer.Trace(ctx, "Get", req, res, err)
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) (er
 }
 
 func (srv *service) Auth(ctx context.Context, in *pb.User, out *pb.Token) (err error) {
-	defer middleware.Trace(ctx, "Auth", in, out, err)
+	defer tracer.Trace(ctx, "Auth", in, out, err)
 	user, err := srv.repo.GetByEmail(in.Email)
 	if err != nil {
 		return err

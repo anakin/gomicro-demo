@@ -1,6 +1,7 @@
 package main
 
 import (
+	"demo4/lib/tracer"
 	"demo4/middleware"
 	pb "demo4/restaurant-service/proto/restaurant"
 	"time"
@@ -10,20 +11,25 @@ import (
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry/consul"
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
-	"github.com/opentracing/opentracing-go"
 )
 
 const ServiceName = "chope.co.srv.restaurant"
 
+func init() {
+	middleware.InitWithFile(".env.json")
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02T15:04:05.000",
+		FullTimestamp:   true,
+	})
+}
+
 func main() {
 	//opentracing
-
-	t, io, err := middleware.NewTracer(ServiceName)
+	t, io, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Error(err)
 	}
 	defer io.Close()
-	opentracing.SetGlobalTracer(t)
 
 	reg := consul.NewRegistry()
 	srv := micro.NewService(
@@ -32,7 +38,8 @@ func main() {
 		micro.RegisterTTL(time.Second*30),
 		micro.Registry(reg),
 		micro.WrapHandler(ocplugin.NewHandlerWrapper(t), middleware.LogHandlerWrapper),
-		micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
+		//micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
+		micro.WrapClient(middleware.LogClientWrapper),
 	)
 	srv.Init()
 	repo := &BookRepository{}

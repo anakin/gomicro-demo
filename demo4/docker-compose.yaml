@@ -41,21 +41,6 @@ services:
       MYSQL_DATABASE: test
       MYSQL_USER: testuser
       MYSQL_PASSWORD: test123
-  micro:
-    command: --registry=consul --registry_address=consul:8500 api --handler=http --namespace=chope.co.api
-    image: microhq/micro:latest
-    links:
-      - consul
-      - api
-    ports:
-      - "8080:8080"
-  api:
-    build: ./build/api
-    entrypoint: ./api --registry=consul --registry_address=consul:8500
-    links:
-      - consul
-      - nats
-      - jaeger
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -63,26 +48,40 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     links:
-      - api
+      - micro
+  micro:
+    build: ./build/gateway
+    links:
+      - consul
+      - jaeger
+      - nats
+    ports:
+      - "8080:8080"
+
+  user-api:
+    build: ./build/user-api
+    links:
+      - consul
+      - nats
+      - jaeger
+
   user-service:
     build: ./build/user-service
-    entrypoint: ./user-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - db
       - redis
       - consul
       - nats
       - jaeger
+
   restaurant-service:
     build: ./build/restaurant-service
-    entrypoint: ./restaurant-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
       - nats
       - jaeger
   diner-service:
     build: ./build/diner-service
-    entrypoint: ./diner-service --registry=consul --registry_address=consul:8500 --broker=nats --broker_address=nats
     links:
       - consul
       - nats

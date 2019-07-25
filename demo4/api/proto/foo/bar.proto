@@ -1,8 +1,0 @@
-syntax ="proto3";
-
-import "github.com/micro/go-micro/api/proto/api.proto";
-
-service Foo{
-    rpc Bar(go.api.Request) returns (go.api.Response);
-}
-

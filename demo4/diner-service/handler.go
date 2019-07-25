@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"demo4/middleware"
+	"demo4/lib/tracer"
 	pb "demo4/user-service/proto/user"
 
 	"github.com/sirupsen/logrus"
@@ -19,7 +19,7 @@ type Sub struct {
 //}
 
 func (s *Sub) Process(ctx context.Context, ev *pb.Event) (err error) {
-	defer middleware.Trace(ctx, "Process", ev, nil, err)
+	defer tracer.Trace(ctx, "Process", ev, nil, err)
 	md, _ := metadata.FromContext(ctx)
 	logrus.Info("[diner] Received event %+v with metadata %+v\n", ev, md)
 	return nil

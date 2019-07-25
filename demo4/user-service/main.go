@@ -1,6 +1,7 @@
 package main
 
 import (
+	"demo4/lib/tracer"
 	"demo4/middleware"
 	pb "demo4/user-service/proto/user"
 
@@ -20,6 +21,7 @@ const ServiceName = "chope.co.srv.user"
 const BrokerServiceName = "chope.co.pubsub.user"
 
 func init() {
+	middleware.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
@@ -30,10 +32,9 @@ func main() {
 	var consulAddr string
 
 	//config from file
-	middleware.InitWithFile(".env.json")
 
 	//opentracing
-	tracer, closer, err := middleware.NewTracer(ServiceName)
+	tracer, closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -55,7 +56,8 @@ func main() {
 		micro.Broker(broker),
 		micro.Name(ServiceName),
 		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(tracer)),
-		micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
+		//micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
+		micro.WrapClient(middleware.LogClientWrapper),
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",

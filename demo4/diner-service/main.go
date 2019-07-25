@@ -1,11 +1,12 @@
 package main
 
 import (
+	"demo4/lib/tracer"
 	"demo4/middleware"
 
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
-	micro "github.com/micro/go-micro"
+	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/broker/nats"
 	"github.com/micro/go-micro/registry/consul"
 	"github.com/sirupsen/logrus"
@@ -14,12 +15,17 @@ import (
 const ServiceName = "chope.co.srv.diner"
 const PubSubServiceName = "chope.co.pubsub.user"
 
-func main() {
-	//config from file
+func init() {
 	middleware.InitWithFile(".env.json")
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02T15:04:05.000",
+		FullTimestamp:   true,
+	})
+}
 
+func main() {
 	//opentracing
-	tracer, closer, err := middleware.NewTracer(ServiceName)
+	tracer, closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Error(err)
 	}
