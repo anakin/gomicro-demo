@@ -6,6 +6,8 @@ import (
 	pb "demo4/restaurant-service/proto/restaurant"
 	"time"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/micro/go-micro"
@@ -30,14 +32,14 @@ func main() {
 		logrus.Error(err)
 	}
 	defer io.Close()
-
+	opentracing.SetGlobalTracer(t)
 	reg := consul.NewRegistry()
 	srv := micro.NewService(
 		micro.Name(ServiceName),
 		micro.RegisterInterval(time.Second*10),
 		micro.RegisterTTL(time.Second*30),
 		micro.Registry(reg),
-		micro.WrapHandler(ocplugin.NewHandlerWrapper(t), middleware.LogHandlerWrapper),
+		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer()), middleware.LogHandlerWrapper),
 		//micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
 		micro.WrapClient(middleware.LogClientWrapper),
 	)

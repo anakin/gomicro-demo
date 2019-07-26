@@ -4,6 +4,8 @@ import (
 	"demo4/lib/tracer"
 	"demo4/middleware"
 
+	"github.com/opentracing/opentracing-go"
+
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
 
 	"github.com/micro/go-micro"
@@ -25,11 +27,12 @@ func init() {
 
 func main() {
 	//opentracing
-	tracer, closer, err := tracer.NewTracer(ServiceName)
+	t, c, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Error(err)
 	}
-	defer closer.Close()
+	defer c.Close()
+	opentracing.SetGlobalTracer(t)
 	//registry
 	reg := consul.NewRegistry()
 
@@ -39,7 +42,7 @@ func main() {
 		micro.Name(ServiceName),
 		micro.Broker(broker),
 		micro.Registry(reg),
-		micro.WrapSubscriber(ocplugin.NewSubscriberWrapper(tracer)),
+		micro.WrapSubscriber(ocplugin.NewSubscriberWrapper(opentracing.GlobalTracer())),
 	)
 	srv.Init()
 	_ = micro.RegisterSubscriber(PubSubServiceName, srv.Server(), new(Sub))

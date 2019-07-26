@@ -6,12 +6,8 @@ import (
 	"demo4/lib/wrapper/metrics/prometheus"
 	"demo4/lib/wrapper/tracer/opentracing/stdhttp"
 	"demo4/middleware"
-	"net"
-	"net/http"
 
 	"github.com/micro/go-micro"
-
-	hx "github.com/afex/hystrix-go/hystrix"
 
 	"github.com/micro/go-plugins/micro/cors"
 	"github.com/micro/micro/cmd"
@@ -60,9 +56,9 @@ func main() {
 	defer io.Close()
 	opentracing.SetGlobalTracer(t)
 
-	hystrixStreamHandler := hx.NewStreamHandler()
-	hystrixStreamHandler.Start()
-	go http.ListenAndServe(net.JoinHostPort("", "81"), hystrixStreamHandler)
+	//hystrixStreamHandler := hx.NewStreamHandler()
+	//hystrixStreamHandler.Start()
+	//go http.ListenAndServe(net.JoinHostPort("", "81"), hystrixStreamHandler)
 
 	cmd.Init(
 		micro.Name("chope.co.api"),

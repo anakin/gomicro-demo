@@ -21,6 +21,6 @@ type Sub struct {
 func (s *Sub) Process(ctx context.Context, ev *pb.Event) (err error) {
 	defer tracer.Trace(ctx, "Process", ev, nil, err)
 	md, _ := metadata.FromContext(ctx)
-	logrus.Info("[diner] Received event %+v with metadata %+v\n", ev, md)
+	logrus.Infof("[diner] Received event %+v with metadata %+v\n", ev, md)
 	return nil
 }

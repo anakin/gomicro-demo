@@ -5,6 +5,8 @@ import (
 	"demo4/middleware"
 	pb "demo4/user-service/proto/user"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/sirupsen/logrus"
 
 	ocplugin "github.com/micro/go-plugins/wrapper/trace/opentracing"
@@ -34,14 +36,15 @@ func main() {
 	//config from file
 
 	//opentracing
-	tracer, closer, err := tracer.NewTracer(ServiceName)
+	t, c, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Error(err)
 	}
-	defer closer.Close()
+	defer c.Close()
+	opentracing.SetGlobalTracer(t)
 
 	//限流
-	r := rl.NewBucketWithRate(1, 1)
+	r := rl.NewBucketWithRate(1000, 1000)
 
 	//registry
 	reg := consul.NewRegistry()
@@ -55,7 +58,7 @@ func main() {
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name(ServiceName),
-		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(tracer)),
+		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
 		//micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
 		micro.WrapClient(middleware.LogClientWrapper),
 		micro.Flags(cli.StringFlag{
