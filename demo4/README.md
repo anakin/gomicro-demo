@@ -4,20 +4,11 @@
 
 #### 1. build 执行文件
 ```
-cd user-service
-make build
+chmod +x make-build.sh
+./make-build.sh
+```
 
-cd api
-make build
-
-cd restaurant-service
-make build
-```
-#### 2. 启动容器
-```
-docker-compose up
-```
-#### 3. 访问
+#### 2. 访问
 
 创建用户：
 ```
@@ -32,13 +23,13 @@ curl localhost:8080/user/info
 post localhost:8080/user/auth
 ```
 
-#### 4. consul UI
+#### 3. consul UI
 http://localhost:8500
 
-#### 5. jaeger UI
+#### 4. jaeger UI
 http://localhost:16686
 
-#### 6. prometheus UI
+#### 5. prometheus UI
 http://localhost:9090
 
 ### TODO

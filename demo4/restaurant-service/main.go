@@ -4,6 +4,7 @@ import (
 	"demo4/lib/tracer"
 	"demo4/middleware"
 	pb "demo4/restaurant-service/proto/restaurant"
+	"os"
 	"time"
 
 	"github.com/opentracing/opentracing-go"
@@ -23,6 +24,7 @@ func init() {
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
 	})
+	logrus.SetOutput(os.Stderr)
 }
 
 func main() {
@@ -41,7 +43,6 @@ func main() {
 		micro.Registry(reg),
 		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer()), middleware.LogHandlerWrapper),
 		//micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
-		micro.WrapClient(middleware.LogClientWrapper),
 	)
 	srv.Init()
 	repo := &BookRepository{}

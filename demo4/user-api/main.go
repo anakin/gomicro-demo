@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"demo4/lib/tracer"
-	"demo4/lib/wrapper/tracer/opentracing/gin2micro"
 	"demo4/user-api/handler"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/opentracing/opentracing-go"
@@ -16,6 +16,7 @@ import (
 	hystrixplugin "github.com/micro/go-plugins/wrapper/breaker/hystrix"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	libtracer "demo4/lib/wrapper/tracer"
 	"demo4/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -33,11 +34,12 @@ func init() {
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
 	})
+	logrus.SetOutput(os.Stderr)
 }
 
 func main() {
 
-	gin2micro.SetSamplingFrequency(50)
+	libtracer.SetSamplingFrequency(50)
 	t, io, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		logrus.Fatal(err)
@@ -72,7 +74,7 @@ func main() {
 	h := handler.New(sClient)
 	router := gin.Default()
 	r := router.Group("/user")
-	r.Use(gin2micro.TracerWrapper)
+	r.Use(libtracer.GinWrapper)
 	r.GET("/info", h.Info)
 	r.POST("/create", h.Create)
 	r.POST("/auth", h.Auth)
@@ -88,7 +90,7 @@ func PrometheusBoot() {
 	go func() {
 		err := http.ListenAndServe(":8085", nil)
 		if err != nil {
-			logrus.Println(err)
+			logrus.Error(err)
 		}
 	}()
 }

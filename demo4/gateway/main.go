@@ -4,10 +4,11 @@ import (
 	"demo4/lib/tracer"
 	"demo4/lib/wrapper/breaker/hystrix"
 	"demo4/lib/wrapper/metrics/prometheus"
-	"demo4/lib/wrapper/tracer/opentracing/stdhttp"
 	"demo4/middleware"
 
 	"github.com/micro/go-micro"
+
+	libtracer "demo4/lib/wrapper/tracer"
 
 	"github.com/micro/go-plugins/micro/cors"
 	"github.com/micro/micro/cmd"
@@ -23,7 +24,7 @@ func init() {
 	_ = plugin.Register(plugin.NewPlugin(
 		plugin.WithName("tracer"),
 		plugin.WithHandler(
-			stdhttp.TracerWrapper,
+			libtracer.HttpWrapper,
 		),
 	))
 	_ = plugin.Register(plugin.NewPlugin(
@@ -48,7 +49,7 @@ func init() {
 const name = "API gateway"
 
 func main() {
-	stdhttp.SetSamplingFrequency(50)
+	libtracer.SetSamplingFrequency(50)
 	t, io, err := tracer.NewTracer(name)
 	if err != nil {
 		logrus.Fatal(err)

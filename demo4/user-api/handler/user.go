@@ -2,7 +2,7 @@ package handler
 
 import (
 	"demo4/lib/tracer"
-	"demo4/lib/wrapper/tracer/opentracing/gin2micro"
+	libtracer "demo4/lib/wrapper/tracer"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -28,7 +28,7 @@ func New(client client.Client) *UserServiceHandler {
 func (u *UserServiceHandler) Info(c *gin.Context) {
 
 	req := &usersrv.User{Id: 1}
-	ctx, ok := gin2micro.ContextWithSpan(c)
+	ctx, ok := libtracer.ContextWithSpan(c)
 	if !ok {
 		logrus.Error("context error")
 	}
@@ -43,7 +43,7 @@ func (u *UserServiceHandler) Info(c *gin.Context) {
 func (u *UserServiceHandler) Create(c *gin.Context) {
 
 	req := &usersrv.User{Name: "anakin", Password: "123456", Company: "chope", Email: "anakin.sun@chope.co"}
-	ctx, ok := gin2micro.ContextWithSpan(c)
+	ctx, ok := libtracer.ContextWithSpan(c)
 	if !ok {
 		logrus.Error("context error")
 	}
@@ -60,7 +60,7 @@ func (u *UserServiceHandler) Auth(c *gin.Context) {
 		Email:    "anakin.sun@chope.co",
 		Password: "123456",
 	}
-	ctx, ok := gin2micro.ContextWithSpan(c)
+	ctx, ok := libtracer.ContextWithSpan(c)
 	if !ok {
 		logrus.Error("context error")
 	}

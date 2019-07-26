@@ -3,7 +3,6 @@ package hystrix
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -24,7 +23,7 @@ func BreakerWrapper(h http.Handler) http.Handler {
 
 			if sct.Status >= http.StatusBadRequest {
 				str := fmt.Sprintf("status code %d", sct.Status)
-				log.Println(str)
+				logrus.Error(str)
 				return errors.New(str)
 			}
 			return nil

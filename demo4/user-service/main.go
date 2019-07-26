@@ -58,9 +58,9 @@ func main() {
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name(ServiceName),
+
 		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
-		//micro.WrapClient(ocplugin.NewClientWrapper(tracer), middleware.LogClientWrapper),
-		micro.WrapClient(middleware.LogClientWrapper),
+
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
 			Usage:  "consul address for K/V",
