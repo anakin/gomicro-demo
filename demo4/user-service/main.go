@@ -1,8 +1,9 @@
 package main
 
 import (
+	"demo4/lib/config"
+	"demo4/lib/logger"
 	"demo4/lib/tracer"
-	"demo4/middleware"
 	pb "demo4/user-service/proto/user"
 
 	"github.com/opentracing/opentracing-go"
@@ -23,7 +24,7 @@ const ServiceName = "chope.co.srv.user"
 const BrokerServiceName = "chope.co.pubsub.user"
 
 func init() {
-	middleware.InitWithFile(".env.json")
+	config.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
@@ -53,13 +54,13 @@ func main() {
 	broker := nats.NewBroker()
 
 	//breaker
-	breaker := middleware.NewHytrixWrapper()
+	//breaker := middleware.NewHytrixWrapper()
 	srv := micro.NewService(
 		micro.Registry(reg),
 		micro.Broker(broker),
 		micro.Name(ServiceName),
 
-		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), middleware.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
+		micro.WrapHandler(ratelimit.NewHandlerWrapper(r, false), logger.LogHandlerWrapper, ocplugin.NewHandlerWrapper(opentracing.GlobalTracer())),
 
 		micro.Flags(cli.StringFlag{
 			Name:   "consul_address",
@@ -67,7 +68,7 @@ func main() {
 			EnvVar: "CONSUL_ADDRESS",
 			Value:  "127.0.0.1:8500",
 		}),
-		micro.WrapClient(breaker, middleware.LogClientWrapper),
+		micro.WrapClient(logger.LogClientWrapper),
 		//从命令行获取consul服务的地址
 		micro.Action(func(ctx *cli.Context) {
 			consulAddr = ctx.String("consul_address")

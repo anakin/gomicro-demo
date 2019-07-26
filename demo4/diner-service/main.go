@@ -1,8 +1,8 @@
 package main
 
 import (
+	"demo4/lib/config"
 	"demo4/lib/tracer"
-	"demo4/middleware"
 
 	"github.com/opentracing/opentracing-go"
 
@@ -18,7 +18,7 @@ const ServiceName = "chope.co.srv.diner"
 const PubSubServiceName = "chope.co.pubsub.user"
 
 func init() {
-	middleware.InitWithFile(".env.json")
+	config.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,

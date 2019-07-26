@@ -1,10 +1,10 @@
 package main
 
 import (
+	"demo4/lib/config"
 	"demo4/lib/tracer"
 	"demo4/lib/wrapper/breaker/hystrix"
 	"demo4/lib/wrapper/metrics/prometheus"
-	"demo4/middleware"
 
 	"github.com/micro/go-micro"
 
@@ -39,7 +39,7 @@ func init() {
 			prometheus.MetricsWrapper,
 		),
 	))
-	middleware.InitWithFile(".env.json")
+	config.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,

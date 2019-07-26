@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"demo4/lib/config"
 	"demo4/lib/tracer"
 	"demo4/user-api/handler"
-	"net/http"
 	"os"
 	"time"
 
@@ -13,11 +13,9 @@ import (
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/sirupsen/logrus"
 
-	hystrixplugin "github.com/micro/go-plugins/wrapper/breaker/hystrix"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	libtracer "demo4/lib/wrapper/tracer"
-	"demo4/middleware"
+
+	hystrixplugin "github.com/micro/go-plugins/wrapper/breaker/hystrix"
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
@@ -29,7 +27,7 @@ import (
 const ServiceName = "chope.co.api.user"
 
 func init() {
-	middleware.InitWithFile(".env.json")
+	config.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
@@ -60,7 +58,12 @@ func main() {
 
 	_ = srv.Init()
 
+	//breaker config
 	hystrix.DefaultTimeout = 5000
+	hystrix.DefaultSleepWindow = 200
+	hystrix.DefaultErrorPercentThreshold = 10
+	hystrix.DefaultMaxConcurrent = 2
+	hystrix.DefaultVolumeThreshold = 1
 
 	sClient := hystrixplugin.NewClientWrapper()(srv.Options().Service.Client())
 	_ = sClient.Init(
@@ -83,14 +86,4 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	//PrometheusBoot()
-}
-func PrometheusBoot() {
-	http.Handle("/metrics", promhttp.Handler())
-	go func() {
-		err := http.ListenAndServe(":8085", nil)
-		if err != nil {
-			logrus.Error(err)
-		}
-	}()
 }

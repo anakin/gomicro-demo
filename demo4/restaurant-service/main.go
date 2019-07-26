@@ -1,8 +1,9 @@
 package main
 
 import (
+	"demo4/lib/config"
+	"demo4/lib/logger"
 	"demo4/lib/tracer"
-	"demo4/middleware"
 	pb "demo4/restaurant-service/proto/restaurant"
 	"os"
 	"time"
@@ -19,7 +20,7 @@ import (
 const ServiceName = "chope.co.srv.restaurant"
 
 func init() {
-	middleware.InitWithFile(".env.json")
+	config.InitWithFile(".env.json")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02T15:04:05.000",
 		FullTimestamp:   true,
@@ -41,7 +42,7 @@ func main() {
 		micro.RegisterInterval(time.Second*10),
 		micro.RegisterTTL(time.Second*30),
 		micro.Registry(reg),
-		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer()), middleware.LogHandlerWrapper),
+		micro.WrapHandler(ocplugin.NewHandlerWrapper(opentracing.GlobalTracer()), logger.LogHandlerWrapper),
 		//micro.WrapClient(ocplugin.NewClientWrapper(t), middleware.LogClientWrapper),
 	)
 	srv.Init()

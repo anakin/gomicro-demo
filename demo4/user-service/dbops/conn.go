@@ -1,7 +1,7 @@
 package dbops
 
 import (
-	"demo4/middleware"
+	"demo4/lib/config"
 	"fmt"
 	"log"
 	"time"
@@ -16,7 +16,7 @@ var (
 )
 
 func Init() {
-	cfg := middleware.G_cfg
+	cfg := config.G_cfg
 
 	host := cfg.Db.Master.Host
 	port := cfg.Db.Master.Port

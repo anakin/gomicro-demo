@@ -2,14 +2,14 @@ package tracer
 
 import (
 	"context"
-	"demo4/middleware"
+	"demo4/lib/config"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/micro/go-micro/metadata"
-	opentracing "github.com/opentracing/opentracing-go"
-	jaeger "github.com/uber/jaeger-client-go"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
 )
 
@@ -27,7 +27,7 @@ func NewTracer(servicename string) (opentracing.Tracer, io.Closer, error) {
 		},
 	}
 
-	addr := fmt.Sprintf("%s:%d", middleware.G_cfg.Jaeger.Host, middleware.G_cfg.Jaeger.Port)
+	addr := fmt.Sprintf("%s:%d", config.G_cfg.Jaeger.Host, config.G_cfg.Jaeger.Port)
 	sender, err := jaeger.NewUDPTransport(addr, 0)
 	if err != nil {
 		return nil, nil, err
