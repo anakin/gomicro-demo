@@ -58,7 +58,6 @@ func main() {
 
 	_ = srv.Init()
 
-	//breaker config
 	hystrix.DefaultTimeout = 5000
 	hystrix.DefaultSleepWindow = 200
 	hystrix.DefaultErrorPercentThreshold = 10
