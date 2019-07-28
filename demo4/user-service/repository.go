@@ -3,6 +3,8 @@ package main
 import (
 	"demo4/user-service/dbops"
 	pb "demo4/user-service/proto/user"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Repository interface
@@ -38,8 +40,13 @@ func (u *UserRepository) Create(uinfo *pb.User) (*pb.User, error) {
 //Get get user info
 func (u *UserRepository) Get(id int32) (*pb.User, error) {
 	dbops.Init()
-	defer dbops.DBConn.Close()
-	return dbops.GetUserById(id)
+	res, err := dbops.GetUserById(id)
+	//logrus.Info("get user:", res)
+	err1 := dbops.DBConn.Close()
+	if err1 != nil {
+		logrus.Error("close db error:", err1)
+	}
+	return res, err
 
 }
 func (u *UserRepository) GetByEmail(email string) (*pb.User, error) {

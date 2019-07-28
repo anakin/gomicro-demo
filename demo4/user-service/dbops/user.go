@@ -25,6 +25,7 @@ func GetUserById(id int32) (*pb.User, error) {
 
 func Create(user *User) (int32, error) {
 	err := DBConn.Save(user).Error
+	defer DBConn.Close()
 	if err != nil {
 		return 0, err
 	}
@@ -34,6 +35,7 @@ func Create(user *User) (int32, error) {
 func GetUserByEmail(email string) (*pb.User, error) {
 	user := &pb.User{}
 	err := DBConn.Where(&User{Email: email}).First(&user).Error
+	defer DBConn.Close()
 	if err != nil {
 		return nil, err
 	}

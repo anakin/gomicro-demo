@@ -29,7 +29,7 @@ func Init() {
 		log.Println("connect to mysql error")
 	}
 	DBConn.DB().SetMaxOpenConns(100)
-	DBConn.DB().SetConnMaxLifetime(time.Hour)
-	DBConn.DB().SetMaxIdleConns(10)
+	DBConn.DB().SetConnMaxLifetime(time.Minute)
+	DBConn.DB().SetMaxIdleConns(100)
 	DBConn.Set("gorm:table_options", "ENGINE=InnoDB,CHARSET=utf8mb4").AutoMigrate(User{}).AddUniqueIndex("idx_email", "email")
 }

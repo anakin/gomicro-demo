@@ -49,6 +49,20 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     links:
       - micro
+      - exporter
+
+  exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
   micro:
     build: ./build/gateway
     links:
